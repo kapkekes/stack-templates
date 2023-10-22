@@ -1,0 +1,131 @@
+{-# START_FILE package.yaml #-}
+name:                {{name}}
+version:             0.1.0.0
+github:              "{{github-username}}{{^github-username}}githubuser{{/github-username}}/{{name}}"
+author:              "{{author-name}}{{^author-name}}Author name here{{/author-name}}"
+copyright:           "{{copyright}}{{^copyright}}{{year}}{{^year}}2023{{/year}} {{author-name}}{{^author-name}}Author name here{{/author-name}}{{/copyright}}"
+
+extra-source-files:
+- README.md
+
+dependencies:
+- base >= 4.7 && < 5
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs: source
+
+tests:
+  {{name}}-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - {{name}}
+    - hspec
+    - QuickCheck
+
+{-# START_FILE Setup.hs #-}
+import Distribution.Simple
+main = defaultMain
+
+{-# START_FILE test/Spec.hs #-}
+{-# OPTIONS_GHC -F -pgmF hspec-discover #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
+
+{-# START_FILE test/SolutionSpec.hs #-}
+{-# OPTIONS_GHC -Wno-type-defaults #-}
+module SolutionSpec
+    ( spec
+    ) where
+
+
+import Data.List ( nub )
+
+import Test.Hspec ( describe, Spec, it, shouldBe )
+import Test.Hspec.QuickCheck ( modifyMaxSuccess )
+import Test.QuickCheck ( property )
+
+import Solution ( pythagoreanTriples, primitivePythagoreanTriples, unique, perfectNumbers, cantorPairs, minimalDistance )
+
+spec :: Spec
+spec = do
+    describe "unique" $ do
+        modifyMaxSuccess (const 10000) $ it "is equal to (\\x -> length (nub x) == length x)" $ property $
+            ((\x -> unique x `shouldBe` (length (nub x) == length x)) :: ([Int] -> IO ()))
+
+    describe "pythagoreanTriples" $ do
+        it "produces Pythagorean triples" $ do
+            take 10 pythagoreanTriples `shouldBe` [(3,4,5),(6,8,10),(5,12,13),(9,12,15),(8,15,17),(12,16,20),(15,20,25),(7,24,25),(10,24,26),(20,21,29)]
+
+    describe "primitivePythagoreanTriples" $ do
+        it "produces primitive Pythagorean triples" $ do
+            take 10 primitivePythagoreanTriples `shouldBe` [(3,4,5),(5,12,13),(8,15,17),(7,24,25),(20,21,29),(12,35,37),(9,40,41),(28,45,53),(11,60,61),(33,56,65)]
+
+    describe "perfectNumbers" $ do
+        it "can produce first 4 perfect numbers" $ do
+            take 4 perfectNumbers `shouldBe` [6,28,496,8128]
+
+    describe "cantorPairs" $ do
+        it "produces a list, which elements are Cantor pairs" $ do
+            take 10 cantorPairs `shouldBe` [(0,0),(1,0),(0,1),(2,0),(1,1),(0,2),(3,0),(2,1),(1,2),(0,3)]
+
+        it "and does this effectively" $ do
+            cantorPairs !! 10000000 `shouldBe` (1627,2844)
+
+    describe "minimalDistance" $ do
+        it "finds the minimal euclidian distance between all possible combinations of two points from a given list of points" $ do
+            (abs (minimalDistance [(-5.23,4.2),(2.456,13.234),(11241,211.2),(-1,0)] - 5.9609) < 0.001) `shouldBe` True
+
+{-# START_FILE source/Solution.hs #-}
+module Solution
+    ( unique
+    , pythagoreanTriples
+    , primitivePythagoreanTriples
+    , perfectNumbers
+    , cantorPairs
+    , minimalDistance
+    ) where
+
+
+unique :: Eq a => [a] -> Bool
+unique [] = True
+unique l = undefined
+
+
+pythagoreanTriples :: Integral a => [(a, a, a)]
+pythagoreanTriples = undefined
+
+
+primitivePythagoreanTriples :: Integral a => [(a, a, a)]
+primitivePythagoreanTriples = undefined
+
+
+perfectNumbers :: Integral a => [a]
+perfectNumbers = undefined
+
+
+cantorPairs :: Integral a => [(a, a)]
+cantorPairs = undefined
+
+
+minimalDistance :: RealFloat a => [(a, a)] -> a
+minimalDistance [] = 1 / 0
+minimalDistance [_] = 1 / 0
+minimalDistance l = undefined
+
+{-# START_FILE README.md #-}
+# {{name}}
