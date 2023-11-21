@@ -64,7 +64,6 @@ data Direction = L | R deriving (Eq, Show)
 --      (если вы не хотите делать данное задание, можете просто проделать
 --      вышеописанные действия, но баллов за такую реализацию не будет)
 -- instance Show a => Show (BinaryTree a) where
---     show :: Show a => BinaryTree a -> String
 --     show tree = "undefined"
 
 
@@ -79,7 +78,6 @@ data Direction = L | R deriving (Eq, Show)
 -- False
 
 instance Eq a => Eq (BinaryTree a) where
-    (==) :: Eq a => BinaryTree a -> BinaryTree a -> Bool
     (==) lhs rhs = False
 
 -- 3.   Напишите функцию, которая будет находить целевой элемент e в
