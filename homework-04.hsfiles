@@ -1,0 +1,147 @@
+{-# START_FILE package.yaml #-}
+name:                {{name}}
+version:             0.1.0.0
+github:              "{{github-username}}{{^github-username}}githubuser{{/github-username}}/{{name}}"
+author:              "{{author-name}}{{^author-name}}Author name here{{/author-name}}"
+copyright:           "{{copyright}}{{^copyright}}{{year}}{{^year}}2023{{/year}} {{author-name}}{{^author-name}}Author name here{{/author-name}}{{/copyright}}"
+
+dependencies:
+- base >= 4.7 && < 5
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs: source
+
+{-# START_FILE Setup.hs #-}
+import Distribution.Simple
+main = defaultMain
+
+{-# START_FILE source/Data/BinaryTree.hs #-}
+module Data.BinaryTree
+    ( BinaryTree
+        ( None
+        , Branch
+        , left
+        , element
+        , right
+        )
+    , btFind
+    , btFindApply
+    , (~=)
+    , btFold
+    ) where
+
+-- 0.   Это домашнее задание сконцентрировано на бинарном дереве.
+--      В данном типе данных None представляет собой отсутствие очередной
+--      ветки, а, к примеру Branch None 1 None - лист со значением 1.
+data BinaryTree a = None | Branch {
+    left :: BinaryTree a,
+    element :: a,
+    right :: BinaryTree a
+} deriving Show
+
+data Direction = L | R deriving (Eq, Show)
+
+-- 1.   Задайте строковое представление типа BinaryTree.
+--      Итоговый формат представления оставляю на выбор вам:
+--      чем более интересное и / или красивое, тем больше баллов!
+--      К тому же, удобное представление поможет вам визуализировать
+--      результаты выполнения следующих функций.
+--      Если вы хотите увидеть пример - закомментируйте три строчки ниже
+--      и припишите deriving Show на 18-й строчке, сразу после фигурной
+--      скобки, после чего возьмите деревья из примеров и введите их в GHCi
+--      или в комментарий с тремя стрелками.
+--      (если вы не хотите делать данное задание, можете просто проделать
+--      вышеописанные действия, но баллов за такую реализацию не будет)
+-- instance Show a => Show (BinaryTree a) where
+--     show :: Show a => BinaryTree a -> String
+--     show tree = "undefined"
+
+
+-- 2.   Задайте строгое равенство для двух бинарных деревьев.
+--      Считайте деревья равными, если их element'ы равны, левые и правые
+--      ветви идентичны по форме и значениям соответствующих элементов.
+--      (примечание: не левая ветвь идентична правой, а левая ветвь первого
+--      дерева и левая ветвь второго дерева; то же самое про правые)
+-- >>> (Branch None 1 (Branch None 2 None)) == (Branch None 1 (Branch None 2 None))
+-- True
+-- >>> (Branch (Branch None 2 None) 1 None) == (Branch None 1 (Branch None 2 None))
+-- False
+
+instance Eq a => Eq (BinaryTree a) where
+    (==) :: Eq a => BinaryTree a -> BinaryTree a -> Bool
+    (==) lhs rhs = False
+
+-- 3.   Напишите функцию, которая будет находить целевой элемент e в
+--      переданном дереве t. Можно использовать как поиск в глубину, так и
+--      поиск в ширину (если вы знаете другие алгоритмы - можно использовать
+--      и их).
+--      Если такого элемента в дереве нет, вы должны вернуть значение Nothing.
+--      (это предопределённое значение, его не нужно импортировать)
+--      Если целевой элемент присутствует в дереве, нужно вернуть список,
+--      состоящий из значений L и R, которые будут соответствовать функциям
+--      left и right (они берут левую и правую ветки соответственно);
+--      если последовательно применить все значения из этого списка на дерево,
+--      то, должно получаться дерево с элементом target.
+--      (для соблюдения сигнатуры, полученный список нужно обернуть в
+--      Just (ваш-список) ИЛИ Just $ ваш-список)
+--      Для проверки можно использовать функцию btFindApply.
+-- >>> btFind 1 (Branch (Branch None 2 (Branch None 1 None)) 4 (Branch None 5 (Branch None 3 None)))
+-- [L,R]
+-- >>> btFindApply ([L, R]) (Branch (Branch None 2 (Branch None 1 None)) 4 (Branch None 5 (Branch None 3 None)))
+-- Branch {left = None, element = 1, right = None}
+
+btFind :: Eq a => a -> BinaryTree a -> Maybe [Direction]
+btFind e t = Nothing
+
+btFindApply :: [Direction] -> BinaryTree a -> BinaryTree a
+btFindApply [] t = t
+btFindApply (L:xs) t = btFindApply xs $ left t
+btFindApply (R:xs) t = btFindApply xs $ right t
+
+
+-- 4.   Напишите функцию map для BinaryTree.
+--      Она должна применить переданную функцию ко всем element'ам в данном
+--      дереве. Для вдохновения можно посмотреть на функцию map из стандартной
+--      библиотеки, она, напомню, делает ровно то, что требует задание, но
+--      на листах.
+-- >>> btMap (*2) (Branch None 1 (Branch None 2 None))
+-- Branch {left = None, element = 2, right = Branch {left = None, element = 4, right = None}}
+
+btMap :: (a -> b) -> BinaryTree a -> BinaryTree b
+btMap func tree = None
+
+-- 5.   Напишите функцию, которая будет проверять, подобны ли переданные деревья.
+--      Деревья называются подобными, если их элементы равны, а ветви равны вплоть
+--      до отражения, то есть либо левая 1-я ветвь равна левой 2-й ветви и правая
+--      1-я ветвь равна правой 2-й ветви, либо левая 1-я ветвь равна правой 2-й
+--      ветви и левая 2-я ветвь равна правой 1-й ветви (индексами обозначены
+--      1-е и 2-е деревья соответственно).
+-- >>> (Branch None 1 (Branch None 2 None)) ~= (Branch None 1 (Branch None 2 None))
+-- True
+-- >>> (Branch (Branch None 2 None) 1 None) ~= (Branch None 1 (Branch None 2 None))
+-- True
+
+(~=) :: Eq a => BinaryTree a -> BinaryTree a -> Bool
+(~=) l r = False
+
+-- 6*.  Напишите свёртку для BinaryTree. Порядок "разбора" дерева на элементы
+--      (в глубину, в ширину или что-то своё) вы определяете сами и описываете
+--      в комментарии к функции.
+-- >>> btFold 1 (+) (Branch None 1 (Branch None 2 None))
+-- 4
+-- >>> btFold 1 (*) (Branch None 1 (Branch None 2 None))
+-- 2
+
+btFold :: b -> (b -> a -> b) -> BinaryTree a -> b
+btFold acc func tree = acc
